@@ -29,9 +29,15 @@ function Model:new(vertices, texture, pos, rot, sca, color, is_light, ambient_in
 	model.sy       = sca and sca[2] or 1
 	model.sz       = sca and sca[3] or 1
 	model.matrix   = {}
-	model.vertices = vertices
 	model.texture  = texture
+	model.vertices = vertices
+
+	if not model.vertices[6] then 
+		model:generate_normals()
+	end
+
 	model.mesh     = love.graphics.newMesh(Model.vertex_format, model.vertices, "triangles")
+	model.mesh:setTexture(texture)
 
 	model.material = {
 		color       = {color[1] or 1, color[2] or 1, color[3] or 1, color[4] or 1},
@@ -45,6 +51,7 @@ function Model:new(vertices, texture, pos, rot, sca, color, is_light, ambient_in
 	model.light = {
 		color              = {color[1] or 1, color[2] or 1, color[3] or 1, color[4] or 1},
 		is_light           = is_light or false,
+		max_distance       = 20,
 		ambient_intensity  = ambient_intensity or .1,
 		diffuse_intensity  = diffuse_intensity or .3,
 		specular_intensity = specular_intensity or .1,
@@ -54,15 +61,13 @@ function Model:new(vertices, texture, pos, rot, sca, color, is_light, ambient_in
 		model.material.is_lit = false 
 	end
 
-	model.mesh:setTexture(texture)
-	model:generate_normals()
-	model:update_matrix()
-
 	table.insert(Model.models, model)
 
 	if model.light.is_light then
 		Model.update_lights() 
 	end
+
+	model:update_matrix()
 
 	return model
 end
@@ -83,6 +88,7 @@ function Model:update_lights()
 			table.insert(lights, {
 				position           = {model.x, model.y, model.z, 1},
 				color              = model.light.color,
+				max_distance       = model.light.max_distance,
 				ambient_intensity  = model.light.ambient_intensity,
 				diffuse_intensity  = model.light.diffuse_intensity,
 				specular_intensity = model.light.specular_intensity,
@@ -94,6 +100,7 @@ function Model:update_lights()
 		local c_index = i-1
 		Model.shader:send('lights['.. c_index ..'].position'          , light.position)
 		Model.shader:send('lights['.. c_index ..'].color'             , light.color)
+		Model.shader:send('lights['.. c_index ..'].max_distance'      , light.max_distance)
 		Model.shader:send('lights['.. c_index ..'].ambient_intensity' , light.ambient_intensity)
 		Model.shader:send('lights['.. c_index ..'].diffuse_intensity' , light.diffuse_intensity)
 		Model.shader:send('lights['.. c_index ..'].specular_intensity', light.specular_intensity)
@@ -116,14 +123,19 @@ function Model:generate_normals(flipped)
 		vp[6] = normal[1] * flippage
 		vp[7] = normal[2] * flippage
 		vp[8] = normal[3] * flippage
+		vp[9] = 1
 
 		v[6] = normal[1] * flippage
 		v[7] = normal[2] * flippage
 		v[8] = normal[3] * flippage
+		v[9] = 1
+
 
 		vn[6] = normal[1] * flippage
 		vn[7] = normal[2] * flippage
 		vn[8] = normal[3] * flippage
+		vn[9] = 1
+
 	end
 end
 

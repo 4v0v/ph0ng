@@ -11,8 +11,16 @@ function Play_scene:new(id)
 	@.cube5   = g4d.add_model('assets/obj/cube.obj', _ , {-6, 0, 16}, _,  _, {0, 1, 0})
 	@.cube6   = g4d.add_model('assets/obj/cube.obj', _ , {-10, 0, 16}, _, _, {0, 0, 1})
 
-	@.light1 = g4d.add_model('assets/obj/sphere.obj', _ , {5, 10, 16}, _, { .3, .3, .3}, {0, 1, 0}, true, .1, .6)
+	@.light1 = g4d.add_model('assets/obj/sphere.obj', _ , {5, 10, 16}, _, { .3, .3, .3}, {0, 1, 0}, true, .1, 1)
 	@.light2 = g4d.add_model('assets/obj/sphere.obj', _ , {-5, 5, 5}, _, { .3, .3, .3}, {1, 1, 0}, true, .1, .6)
+
+
+	@.test   = g4d.add_model(
+		{
+			{ 0,  0, 10},
+			{ 3,  5, 12},
+			{10, 10, 10},
+		})
 
 	@.f = Sinewave(0, 1, 10)
 	@.g = Sinewave(0, 2, 20)
