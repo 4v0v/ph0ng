@@ -140,4 +140,41 @@ function Matrices:get_value_at(matrix, x,y)
 	return matrix[x + (y-1)*4]
 end
 
+function Matrices:transpose(m)
+	return {
+			self:get_value_at(m, 1,1), self:get_value_at(m, 1,2), self:get_value_at(m, 1,3), self:get_value_at(m, 1,4),
+			self:get_value_at(m, 2,1), self:get_value_at(m, 2,2), self:get_value_at(m, 2,3), self:get_value_at(m, 2,4),
+			self:get_value_at(m, 3,1), self:get_value_at(m, 3,2), self:get_value_at(m, 3,3), self:get_value_at(m, 3,4),
+			self:get_value_at(m, 4,1), self:get_value_at(m, 4,2), self:get_value_at(m, 4,3), self:get_value_at(m, 4,4),
+	}
+end
+
+function Matrices:invert(m)
+	local matrix = self:get_identity_matrix()
+	matrix[1]  =  m[6] * m[11] * m[16] - m[6] * m[12] * m[15] - m[10] * m[7] * m[16] + m[10] * m[8] * m[15] + m[14] * m[7] * m[12] - m[14] * m[8] * m[11]
+	matrix[2]  = -m[2] * m[11] * m[16] + m[2] * m[12] * m[15] + m[10] * m[3] * m[16] - m[10] * m[4] * m[15] - m[14] * m[3] * m[12] + m[14] * m[4] * m[11]
+	matrix[3]  =  m[2] * m[7]  * m[16] - m[2] * m[8]  * m[15] - m[6]  * m[3] * m[16] + m[6]  * m[4] * m[15] + m[14] * m[3] * m[8]  - m[14] * m[4] * m[7]
+	matrix[4]  = -m[2] * m[7]  * m[12] + m[2] * m[8]  * m[11] + m[6]  * m[3] * m[12] - m[6]  * m[4] * m[11] - m[10] * m[3] * m[8]  + m[10] * m[4] * m[7]
+	matrix[5]  = -m[5] * m[11] * m[16] + m[5] * m[12] * m[15] + m[9]  * m[7] * m[16] - m[9]  * m[8] * m[15] - m[13] * m[7] * m[12] + m[13] * m[8] * m[11]
+	matrix[6]  =  m[1] * m[11] * m[16] - m[1] * m[12] * m[15] - m[9]  * m[3] * m[16] + m[9]  * m[4] * m[15] + m[13] * m[3] * m[12] - m[13] * m[4] * m[11]
+	matrix[7]  = -m[1] * m[7]  * m[16] + m[1] * m[8]  * m[15] + m[5]  * m[3] * m[16] - m[5]  * m[4] * m[15] - m[13] * m[3] * m[8]  + m[13] * m[4] * m[7]
+	matrix[8]  =  m[1] * m[7]  * m[12] - m[1] * m[8]  * m[11] - m[5]  * m[3] * m[12] + m[5]  * m[4] * m[11] + m[9]  * m[3] * m[8]  - m[9]  * m[4] * m[7]
+	matrix[9]  =  m[5] * m[10] * m[16] - m[5] * m[12] * m[14] - m[9]  * m[6] * m[16] + m[9]  * m[8] * m[14] + m[13] * m[6] * m[12] - m[13] * m[8] * m[10]
+	matrix[10] = -m[1] * m[10] * m[16] + m[1] * m[12] * m[14] + m[9]  * m[2] * m[16] - m[9]  * m[4] * m[14] - m[13] * m[2] * m[12] + m[13] * m[4] * m[10]
+	matrix[11] =  m[1] * m[6]  * m[16] - m[1] * m[8]  * m[14] - m[5]  * m[2] * m[16] + m[5]  * m[4] * m[14] + m[13] * m[2] * m[8]  - m[13] * m[4] * m[6]
+	matrix[12] = -m[1] * m[6]  * m[12] + m[1] * m[8]  * m[10] + m[5]  * m[2] * m[12] - m[5]  * m[4] * m[10] - m[9]  * m[2] * m[8]  + m[9]  * m[4] * m[6]
+	matrix[13] = -m[5] * m[10] * m[15] + m[5] * m[11] * m[14] + m[9]  * m[6] * m[15] - m[9]  * m[7] * m[14] - m[13] * m[6] * m[11] + m[13] * m[7] * m[10]
+	matrix[14] =  m[1] * m[10] * m[15] - m[1] * m[11] * m[14] - m[9]  * m[2] * m[15] + m[9]  * m[3] * m[14] + m[13] * m[2] * m[11] - m[13] * m[3] * m[10]
+	matrix[15] = -m[1] * m[6]  * m[15] + m[1] * m[7]  * m[14] + m[5]  * m[2] * m[15] - m[5]  * m[3] * m[14] - m[13] * m[2] * m[7]  + m[13] * m[3] * m[6]
+	matrix[16] =  m[1] * m[6]  * m[11] - m[1] * m[7]  * m[10] - m[5]  * m[2] * m[11] + m[5]  * m[3] * m[10] + m[9]  * m[2] * m[7]  - m[9]  * m[3] * m[6]
+
+	local det = m[1] * matrix[1] + m[2] * matrix[5] + m[3] * matrix[9] + m[4] * matrix[13]
+
+	if det == 0 then return m end
+	det = 1 / det
+	for i = 1, 16 do matrix[i] = matrix[i] * det end
+
+	return matrix
+end
+
 return Matrices
